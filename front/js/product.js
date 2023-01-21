@@ -20,9 +20,45 @@ function afficher(produit) {
     option.textContent = color;
     document.getElementById("colors").appendChild(option);
   }
-  
-
       }
+
+// constante add qui sélectionne le bouton grâce à son id et submit écoute clic ou "entrer"
+
+const form = document.querySelector(".item")
+const add = document.querySelector("#addToCart");
+add.addEventListener("click", function(event) {
+  event.preventDefault(); // permet d'annuler les effets par défaut du bouton
+  const idCouleur = document.querySelector("#colors");
+  const choixCouleur = idCouleur.value;
+  const idQuantite = document.querySelector("#quantity");
+  const choixQuantite = idQuantite.value;
+
+
+  const produitPanier = {
+    idProduit: id,
+    quantiteProduit: parseInt(choixQuantite), //parseInt permet de changer un nombre en string
+    couleurProduit: choixCouleur,
+  }
+  console.log(produitPanier);
+  
+  
+  let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
+  
+  if(produitDansLocalStorage){
+    produitDansLocalStorage.push(produitPanier);
+    localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
+    console.log(produitDansLocalStorage);
+
+  }
+  else {
+    produitDansLocalStorage = [];
+    produitDansLocalStorage.push(produitPanier);
+    localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
+    console.log(produitDansLocalStorage);
+
+  };
+
+})
 
 
 
