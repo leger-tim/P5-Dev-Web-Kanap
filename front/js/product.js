@@ -39,16 +39,27 @@ add.addEventListener("click", function(event) {
     quantiteProduit: parseInt(choixQuantite), //parseInt permet de changer un nombre en string
     couleurProduit: choixCouleur,
   }
-  console.log(produitPanier);
   
   
   let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
   
   if(produitDansLocalStorage){
+
+    for (let i = 0; i < produitDansLocalStorage.length; i++) {
+      // vérifie si idProduit et couleurProduit sont identiques
+      if (produitDansLocalStorage[i].idProduit === produitPanier.idProduit && produitDansLocalStorage[i].couleurProduit === produitPanier.couleurProduit) {
+          // incrémente la quantité si les propriétés sont identiques
+          produitDansLocalStorage[i].quantiteProduit += produitPanier.quantiteProduit;
+          localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
+          console.log(produitDansLocalStorage);
+          return;
+      }
+  }
+
     produitDansLocalStorage.push(produitPanier);
     localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
     console.log(produitDansLocalStorage);
-
+    
   }
   else {
     produitDansLocalStorage = [];
@@ -57,6 +68,7 @@ add.addEventListener("click", function(event) {
     console.log(produitDansLocalStorage);
 
   };
+
 
 })
 
