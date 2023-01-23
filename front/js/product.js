@@ -32,12 +32,17 @@ add.addEventListener("click", function(event) {
   const choixCouleur = idCouleur.value;
   const idQuantite = document.querySelector("#quantity");
   const choixQuantite = idQuantite.value;
+  const prix = document.querySelector("#price");
+  
+
+
 
 
   const produitPanier = {
     idProduit: id,
     quantiteProduit: parseInt(choixQuantite), //parseInt permet de changer un nombre en string
     couleurProduit: choixCouleur,
+    prixProduit: parseInt(prix),
   }
   
   
