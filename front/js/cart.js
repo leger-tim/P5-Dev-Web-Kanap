@@ -1,40 +1,20 @@
+let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
 
+function panier() {
 
-
-let produitDansPanier = JSON.parse(localStorage.getItem("produit"));
-
-let total = 0;
-
-async function obtenirTotalPrix() {
-    for (let i = 0; i < produitDansPanier.length; i++) {
-        let id = produitDansPanier[i].idProduit;
-        let quantite = produitDansPanier[i].quantiteProduit;
-
-        try {
-            let response = await fetch("http://localhost:3000/api/products/" + id);
-            let data = await response.json();
-            let prix = data.price;
-            let montant = prix * quantite;
-            total += montant;
-        } catch (error) {
-        }
-    }
-    let afficherTotalPrix = document.getElementById("totalPrice")
-    afficherTotalPrix.innerText = total;
-}
-async function panier() {
-
-    for (let i = 0; i < produitDansPanier.length; i++) {
-        fetch("http://localhost:3000/api/products/" + produitDansPanier[i].idProduit)
+    for (let i = 0; i < produitDansLocalStorage.length; i++) {
+        fetch("http://localhost:3000/api/products/" + produitDansLocalStorage[i].idProduit)
             .then(data => data.json())
             .then(produit => afficher(produit));
+
+        // Crée les éléments html pour chaque produit ajouté au panier 
 
         function afficher(produit) {
             const selection = document.querySelector("#cart__items");
             const article = document.createElement("article");
             article.classList.add("cart__item");
-            article.setAttribute("data-id", produitDansPanier[i].idProduit); //assigne l'id dans data id 
-            article.setAttribute("data-color", produitDansPanier[i].couleurProduit);
+            article.setAttribute("data-id", produitDansLocalStorage[i].idProduit); //assigne l'id dans data id 
+            article.setAttribute("data-color", produitDansLocalStorage[i].couleurProduit);
             const div1 = document.createElement("div");
             div1.classList.add("cart__item__img");
             const imgElt = document.createElement("img");
@@ -53,7 +33,7 @@ async function panier() {
 
             const input = document.createElement("input");
             input.classList.add("itemQuantity");
-            input.value = produitDansPanier[i].quantiteProduit;
+            input.value = produitDansLocalStorage[i].quantiteProduit;
             input.name = "itemQuantity";
             input.min = 1;
             input.max = 100;
@@ -70,7 +50,7 @@ async function panier() {
             title.innerText = `${produit.name}`;
 
             const couleur = document.createElement("p");
-            couleur.innerText = produitDansPanier[i].couleurProduit;
+            couleur.innerText = produitDansLocalStorage[i].couleurProduit;
 
             const prix = document.createElement("p");
             prix.innerText = `${produit.price} €`;
@@ -90,42 +70,61 @@ async function panier() {
             div221.appendChild(input);
             div222.appendChild(supprimer);
 
-            for (let i in produitDansPanier) {
-                total += produitDansPanier[i].quantiteProduit;
+            // Modifier la valeur des input dans le localstorage
+
+            let inputQuantite = document.querySelectorAll(".itemQuantity");
+            for (let i = 0; i < inputQuantite.length; i++) {
+                inputQuantite[i].addEventListener("change", function () {
+                    let nouvelleQuantite = parseInt(this.value);
+                    let closest = this.closest("[data-id][data-color]");
+                    const id = closest.getAttribute("data-id");
+                    const color = closest.getAttribute("data-color");
+                    let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
+                    for (let i = 0; i < produitDansLocalStorage.length; i++) {
+                        if (produitDansLocalStorage[i].idProduit === id && produitDansLocalStorage[i].couleurProduit === color) {
+                            produitDansLocalStorage[i].quantiteProduit = nouvelleQuantite;
+                            localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
+                            break;
+                        }
+                    }
+                });
+            }
+
+            //Calculer et afficher quantité d'articles dans le Panier
+
+            let total = 0;
+
+            for (let i in produitDansLocalStorage) {
+                total += produitDansLocalStorage[i].quantiteProduit;
             }
 
             let afficherTotal = document.getElementById("totalQuantity");
             afficherTotal.innerText = total;
 
+            // Calculer et afficher le prix total des produits 
+
+            async function obtenirTotalPrix() {
+                let totalPrix = 0;
+                for (let i = 0; i < produitDansLocalStorage.length; i++) {
+                    let id = produitDansLocalStorage[i].idProduit;
+                    let quantite = produitDansLocalStorage[i].quantiteProduit;
+                    try {
+                        let response = await fetch("http://localhost:3000/api/products/" + id);
+                        let data = await response.json();
+                        let prix = data.price;
+                        let montant = prix * quantite;
+                        totalPrix += montant;
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                let afficherTotalPrix = document.getElementById("totalPrice");
+                afficherTotalPrix.innerText = totalPrix;
+            }
             obtenirTotalPrix();
 
-
-
-            let changeQuantite = document.querySelectorAll(".itemQuantity");
-            for (let i = 0; i < changeQuantite.length; i++) {
-                changeQuantite[i].addEventListener('change', changer);
-            }
-            function changer(e) {
-                e.preventDefault();
-                const closest = e.target.closest("[data-id][data-color]");
-                if (closest) {
-                    // faire quelque chose avec closest
-                    const id = closest.getAttribute("data-id");
-                    const color = closest.getAttribute("data-color");
-                    console.log(id, color, e.target.value);
-                    let localsto = localStorage.getItem("produit");
-                    console.log(localsto);
-                    localStorage.setItem("quantiteProduit", e.target.value);
-                }
-            }
-
         }
-
-
-    };
-
+    }
 }
+
 panier();
-
-
-
