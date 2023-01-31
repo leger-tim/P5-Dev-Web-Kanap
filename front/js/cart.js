@@ -9,6 +9,9 @@ function panier() {
 
         // Crée les éléments html pour chaque produit ajouté au panier 
 
+        // Changer le nom des variables div1, div2 etc
+        // Sortir la définition de la fonction de la boucle 
+
         function afficher(produit) {
             const selection = document.querySelector("#cart__items");
             const article = document.createElement("article");
@@ -46,14 +49,16 @@ function panier() {
             supprimer.classList.add("deleteItem");
             supprimer.innerText = "Supprimer"
 
+            //réviser ${} remplacement javascript dans html, innertext devrait contenir du texte seulement  
             const title = document.createElement("h2");
-            title.innerText = `${produit.name}`;
+            title.innerText = produit.name;
 
             const couleur = document.createElement("p");
             couleur.innerText = produitDansLocalStorage[i].couleurProduit;
 
             const prix = document.createElement("p");
-            prix.innerText = `${produit.price} €`;
+            prix.innerText = produit.price + " €";
+
 
             selection.appendChild(article);
             article.appendChild(div1);
@@ -74,12 +79,22 @@ function panier() {
 
             let inputQuantite = document.querySelectorAll(".itemQuantity");
             for (let i = 0; i < inputQuantite.length; i++) {
+                if (inputQuantite[i].value > 100) {
+                    alert("La quantité maximale d'un produit que vous pouvez commander est 100 unités");
+                    inputQuantite[i].value = 100;
+                }
+
                 inputQuantite[i].addEventListener("change", function () {
                     let nouvelleQuantite = parseInt(this.value);
                     let closest = this.closest("[data-id][data-color]");
                     const id = closest.getAttribute("data-id");
                     const color = closest.getAttribute("data-color");
+                    if (inputQuantite[i].value > 100) {
+                        alert("La quantité maximale d'un produit que vous pouvez commander est 100 unités");
+                        inputQuantite[i].value = 100;
+                    }
                     let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
+
                     for (let i = 0; i < produitDansLocalStorage.length; i++) {
                         if (produitDansLocalStorage[i].idProduit === id && produitDansLocalStorage[i].couleurProduit === color) {
                             produitDansLocalStorage[i].quantiteProduit = nouvelleQuantite;
@@ -90,41 +105,145 @@ function panier() {
                 });
             }
 
-            //Calculer et afficher quantité d'articles dans le Panier
 
-            let total = 0;
 
-            for (let i in produitDansLocalStorage) {
-                total += produitDansLocalStorage[i].quantiteProduit;
-            }
+            //Bouton supprimer 
 
-            let afficherTotal = document.getElementById("totalQuantity");
-            afficherTotal.innerText = total;
+            let supprimerProduit = document.querySelectorAll(".deleteItem");
+            for (let i = 0; i < supprimerProduit.length; i++) {
+                supprimerProduit[i].addEventListener("click", function () {
+                    // let closestArticle = this.closest(".cart__item");
+                    // closestArticle.remove();
+                    let closest = this.closest("[data-id][data-color]");
+                    const id = closest.getAttribute("data-id");
+                    const color = closest.getAttribute("data-color");
+                    let supprimerQuantite = 0;
+                    closest.remove();
+                    let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
+                    for (let i = 0; i < produitDansLocalStorage.length; i++) {
+                        if (produitDansLocalStorage[i].idProduit === id && produitDansLocalStorage[i].couleurProduit === color) {
+                            produitDansLocalStorage.splice(i, 1);
+                            localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
+                            updateTotals();
+                            break;
+                        }
 
-            // Calculer et afficher le prix total des produits 
-
-            async function obtenirTotalPrix() {
-                let totalPrix = 0;
-                for (let i = 0; i < produitDansLocalStorage.length; i++) {
-                    let id = produitDansLocalStorage[i].idProduit;
-                    let quantite = produitDansLocalStorage[i].quantiteProduit;
-                    try {
-                        let response = await fetch("http://localhost:3000/api/products/" + id);
-                        let data = await response.json();
-                        let prix = data.price;
-                        let montant = prix * quantite;
-                        totalPrix += montant;
-                    } catch (error) {
-                        console.log(error);
                     }
-                }
-                let afficherTotalPrix = document.getElementById("totalPrice");
-                afficherTotalPrix.innerText = totalPrix;
+                    // produitDansLocalStorage[i] 
+                    // réussir à supprimer un élément en particulier du local storage + modifier directement le total des prix 
+                    // et la quantité 
+
+                })
             }
-            obtenirTotalPrix();
+
+            // // Calculer et afficher le total des articles dans le Panier et le prix total
+
+            let itemQuantity = document.querySelectorAll(".itemQuantity");
+            const totalQuantity = document.getElementById("totalQuantity");
+            const totalPrice = document.getElementById("totalPrice");
+
+
+            updateTotals();
+
+            for (let i = 0; i < itemQuantity.length; i++) {
+                itemQuantity[i].addEventListener("change", updateTotals);
+            }
+
+
+            function updateTotals() {
+                const prixProduitPanier = document.querySelectorAll(".cart__item__content__description :nth-child(3)");
+                itemQuantity = document.querySelectorAll(".itemQuantity");
+                let quantity = 0;
+                let total = 0;
+                for (let i = 0; i < itemQuantity.length; i++) {
+                    quantity += parseInt(itemQuantity[i].value);
+                    total += (parseInt(itemQuantity[i].value) * parseInt(prixProduitPanier[i].innerText));
+                }
+                totalQuantity.innerText = quantity;
+                totalPrice.innerText = total;
+            }
+
 
         }
     }
 }
 
 panier();
+
+const prenomRegex = /^[a-zA-Z]+$/;
+
+let prenom = document.getElementById("firstName");
+prenom.addEventListener('change', function (e) {
+
+    prenom = e.target.value;
+    if (prenomRegex.test(prenom) === true) {
+
+    } else {
+        prenomErreur = document.getElementById("firstNameErrorMsg");
+        prenomErreur.innerHTML = "Utilisez seulement des lettres !";
+
+    }
+
+})
+
+let nom = document.getElementById("lastName");
+nom.addEventListener("change", function (e) {
+    nom = e.target.value;
+    nomErreur = document.getElementById("lastNameErrorMsg");
+    if (prenomRegex.test(nom) === true) {
+        nomErreur.innerHTML = "";
+
+    } else {
+        nomErreur.innerHTML = "Utilisez seulement des lettres !";
+
+    }
+})
+
+const addRegex = /^[a-zA-Z0-9_.-]*$/;
+
+let adresse = document.getElementById("address");
+adresse.addEventListener("change", function (e) {
+    adresse = e.target.value;
+    adresseErreur = document.getElementById("addressErrorMsg");
+    if (addRegex.test(adresse) === true) {
+        adresseErreur.innerHTML = "";
+
+    } else {
+        adresseErreur.innerHTML = "Utilisez seulement des chiffres et des lettres !";
+
+    }
+})
+let ville = document.getElementById("city");
+ville.addEventListener("change", function (e) {
+    ville = e.target.value;
+    villeErreur = document.getElementById("cityErrorMsg");
+    if (prenomRegex.test(ville) === true) {
+        villeErreur.innerHTML = "";
+    } else {
+        villeErreur.innerHTML = "Utilisez seulement des lettres !"
+    }
+})
+
+const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+let email = document.getElementById("email");
+email.addEventListener("change", function (e) {
+    email = e.target.value;
+    emailErreur = document.getElementById("emailErrorMsg");
+    if (emailRegex.test(email) === true) {
+        emailErreur.innerHTML = "";
+
+    } else {
+        emailErreur.innerHTML = "Adresse mail non valide !"
+    }
+})
+
+console.log(email.value);
+
+
+
+
+
+
+
+// TODO : 
+
