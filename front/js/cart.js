@@ -117,7 +117,6 @@ function panier() {
                     let closest = this.closest("[data-id][data-color]");
                     const id = closest.getAttribute("data-id");
                     const color = closest.getAttribute("data-color");
-                    let supprimerQuantite = 0;
                     closest.remove();
                     let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
                     for (let i = 0; i < produitDansLocalStorage.length; i++) {
@@ -170,7 +169,7 @@ function panier() {
 
 panier();
 
-const prenomRegex = /^[a-zA-Z]+$/;
+const prenomRegex = /^[a-zA-ZéèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
 
 let prenom = document.getElementById("firstName");
 prenom.addEventListener('change', function (e) {
@@ -199,7 +198,7 @@ nom.addEventListener("change", function (e) {
     }
 })
 
-const addRegex = /^[a-zA-Z0-9_.-]*$/;
+const addRegex = /^[a-zA-Z0-9éèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
 
 let adresse = document.getElementById("address");
 adresse.addEventListener("change", function (e) {
@@ -237,7 +236,73 @@ email.addEventListener("change", function (e) {
     }
 })
 
-console.log(email.value);
+let commander = document.getElementById("order");
+commander.addEventListener("click", function (e) {
+    e.preventDefault();
+    let contact = new Object();
+    contact.firstName = prenom;
+    contact.lastName = nom;
+    contact.address = adresse;
+    contact.city = ville;
+    contact.email = email;
+    console.log(contact);
+
+    const articleCommander = document.querySelectorAll('.cart__item');
+
+    let products = [];
+
+    for (let i = 0; i < articleCommander.length; i++) {
+        const idProduitCommander = articleCommander[i].getAttribute('data-id');
+
+        products.push(idProduitCommander);
+
+    }
+
+
+    const aEnvoyer = {
+        products,
+        contact,
+    };
+
+    console.log(aEnvoyer);
+    let envoyerCommande = fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(aEnvoyer),
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+
+    });
+
+
+
+    envoyerCommande.then(async (response) => {
+        try {
+
+            const contenu = await response.json();
+            console.log(contenu);
+            console.log(contenu.orderId);
+            window.location.href = "./confirmation.html?orderId=" + contenu.orderId;
+            console.log(contenu.orderId);
+            
+
+        } catch (e) {
+            console.log(e);
+        }
+        
+    })
+    
+
+
+
+
+    
+})
+
+
+
+
 
 
 
