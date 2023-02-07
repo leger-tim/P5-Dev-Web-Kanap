@@ -1,6 +1,10 @@
+// Récupère les données des produits 
+
 fetch("http://localhost:3000/api/products")
     .then (data => data.json())
     .then (articles => afficher(articles));
+
+// Crée les éléments des produits
 
 function afficher(articles) {
     let imageElt;
@@ -25,7 +29,6 @@ function afficher(articles) {
                 lienElt.appendChild(articleElt);
                 document.getElementById("items").appendChild(lienElt);
                 }
-
     }
 
 
