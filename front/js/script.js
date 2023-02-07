@@ -13,7 +13,6 @@ function afficher(articles) {
     let articleElt;
     let lienElt;
     for (const article of articles) {
-        console.log(article)
                 imageElt = document.createElement("img");
                 imageElt.src = article.imageUrl;
                 nomElt = document.createElement("h3");

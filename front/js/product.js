@@ -35,11 +35,27 @@ add.addEventListener("click", function (event) {
   event.preventDefault(); // permet d'annuler les effets par défaut du bouton
 
   // Au clic, la valeur de la couleur et de la quantité sont récupérés
-
+  
   const idCouleur = document.querySelector("#colors");
   const choixCouleur = idCouleur.value;
   const idQuantite = document.querySelector("#quantity");
   const choixQuantite = idQuantite.value;
+
+  // Alerte si une couleur n'a pas été sélectionné et une quantité indiquée
+
+  if (choixCouleur) {
+
+  } else {
+    alert("Vous devez sélectionner une couleur");
+    return;
+  }
+
+  if (choixQuantite !== null && 0 < choixQuantite && choixQuantite < 101) {
+
+  } else {
+    alert("Vous devez indiquer une quantité entre 1 et 100");
+    return;
+  }
 
   // Création de l'objet produitPanier
 
@@ -48,7 +64,7 @@ add.addEventListener("click", function (event) {
     quantiteProduit: parseInt(choixQuantite), //parseInt permet de changer un nombre en string
     couleurProduit: choixCouleur
   }
-
+  
   // Récupération du localstorage et transformation en objet 
 
   let produitDansLocalStorage = JSON.parse(localStorage.getItem("produit"));
@@ -58,29 +74,37 @@ add.addEventListener("click", function (event) {
   if (produitDansLocalStorage) {
 
     for (let i = 0; i < produitDansLocalStorage.length; i++) {
+
       // Vérifie si idProduit et couleurProduit sont identiques
       if (produitDansLocalStorage[i].idProduit === produitPanier.idProduit && produitDansLocalStorage[i].couleurProduit === produitPanier.couleurProduit) {
-        // Vncrémente la quantité si les propriétés sont identiques
+
+        // Vérifie que la quantité totale du produit sélectionné est inférieure ou égale à 100
+
+        if (produitDansLocalStorage[i].quantiteProduit + produitPanier.quantiteProduit > 100) {
+          alert("La quantité totale du produit sélectionné ne doit pas dépasser 100");
+          return;
+        } else {
+
+        };
+        
+        // Incrémente la quantité si les propriétés sont identiques
+
         produitDansLocalStorage[i].quantiteProduit += produitPanier.quantiteProduit;
         localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
-        console.log(produitDansLocalStorage);
+        alert("Votre article a été ajouté au panier");
         return;
       }
     }
-
     produitDansLocalStorage.push(produitPanier);
     localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
-    console.log(produitDansLocalStorage);
 
   }
   else {
     produitDansLocalStorage = [];
     produitDansLocalStorage.push(produitPanier);
     localStorage.setItem("produit", JSON.stringify(produitDansLocalStorage));
-    console.log(produitDansLocalStorage);
-
   };
-
+  alert("Votre article a été ajouté au panier");
 
 })
 

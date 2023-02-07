@@ -12,6 +12,8 @@ function panier() {
       .then((produit) => afficher(produit));
 
     // Crée les éléments html pour chaque produit du panier
+    // SE RENSEIGNER SUR LA PORTEE DES VARIABLES POUR REFACTORISER (OPTIONNEL)
+    // On a changé innerhtml par innertext il faut réviser 
 
     function afficher(produit) {
         const selection = document.querySelector("#cart__items");
@@ -76,29 +78,29 @@ function panier() {
         divContentSettingsQuantity.appendChild(input);
         divContentSettingsDelete.appendChild(supprimer);
     
-
       // Modifier la valeur des input dans le localstorage
 
       let inputQuantite = document.querySelectorAll(".itemQuantity");
       for (let i = 0; i < inputQuantite.length; i++) {
-        if (inputQuantite[i].value > 100) {
-          alert(
-            "La quantité maximale d'un produit que vous pouvez commander est 100 unités"
-          );
-          inputQuantite[i].value = 100;
-        }
+        
 
         inputQuantite[i].addEventListener("change", function () {
           let nouvelleQuantite = parseInt(this.value);
           let closest = this.closest("[data-id][data-color]");
           const id = closest.getAttribute("data-id");
           const color = closest.getAttribute("data-color");
-          if (inputQuantite[i].value > 100) {
+          
+          if (inputQuantite[i].value !== null && 0 < inputQuantite[i].value && inputQuantite[i].value < 101) {
+            
+          }else {
             alert(
-              "La quantité maximale d'un produit que vous pouvez commander est 100 unités"
+              "Veuillez choisir une quantité entre 1 et 100 ou supprimer l'article"
             );
-            inputQuantite[i].value = 100;
+            inputQuantite[i].value = 1;
+
+            return;
           }
+
           let produitDansLocalStorage = JSON.parse(
             localStorage.getItem("produit")
           );
@@ -185,81 +187,110 @@ panier();
 // Création des régex pour chaque champ du formulaire et test si les caractères entrés sont valides 
 
 const prenomRegex = /^[a-zA-ZéèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
+const nomRegex = /^[a-zA-ZéèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
+const villeRegex = /^[a-zA-ZéèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
+const addRegex = /^[a-zA-Z0-9éèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
+const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+let prenom;
+let nom;
+let adresse;
+let ville; 
+let email;
 
-let prenom = document.getElementById("firstName");
-prenom.addEventListener("change", function (e) {
+let prenomInput = document.getElementById("firstName");
+let prenomErreur = document.getElementById("firstNameErrorMsg");
+prenomInput.addEventListener("change", function (e) {
   prenom = e.target.value;
   if (prenomRegex.test(prenom) === true) {
+    prenomErreur.innerText = "";
   } else {
-    prenomErreur = document.getElementById("firstNameErrorMsg");
-    prenomErreur.innerHTML = "Utilisez seulement des lettres !";
+    prenomErreur.innerText = "Utilisez seulement des lettres !";
+    return;
   }
 });
 
-let nom = document.getElementById("lastName");
-nom.addEventListener("change", function (e) {
+let nomInput = document.getElementById("lastName");
+let nomErreur = document.getElementById("lastNameErrorMsg");
+nomInput.addEventListener("change", function (e) {
   nom = e.target.value;
-  nomErreur = document.getElementById("lastNameErrorMsg");
-  if (prenomRegex.test(nom) === true) {
-    nomErreur.innerHTML = "";
+  if (nomRegex.test(nom) === true) {
+    nomErreur.innerText = "";
   } else {
-    nomErreur.innerHTML = "Utilisez seulement des lettres !";
+    nomErreur.innerText = "Utilisez seulement des lettres !";
+    return;
   }
 });
 
-const addRegex = /^[a-zA-Z0-9éèêëàâäôöîïùûüçÉÈÊËÀÂÄÔÖÎÏÙÛÜÇ\s-]+$/;
-
-let adresse = document.getElementById("address");
-adresse.addEventListener("change", function (e) {
+let adresseInput = document.getElementById("address");
+let adresseErreur = document.getElementById("addressErrorMsg");
+adresseInput.addEventListener("change", function (e) {
   adresse = e.target.value;
-  adresseErreur = document.getElementById("addressErrorMsg");
   if (addRegex.test(adresse) === true) {
-    adresseErreur.innerHTML = "";
+    adresseErreur.innerText = "";
   } else {
-    adresseErreur.innerHTML =
-      "Utilisez seulement des chiffres et des lettres !";
+    adresseErreur.innerText = "Utilisez seulement des chiffres et des lettres !";
+    return;
   }
 });
-let ville = document.getElementById("city");
-ville.addEventListener("change", function (e) {
+
+let villeInput = document.getElementById("city");
+let villeErreur = document.getElementById("cityErrorMsg");
+villeInput.addEventListener("change", function (e) {
   ville = e.target.value;
-  villeErreur = document.getElementById("cityErrorMsg");
-  if (prenomRegex.test(ville) === true) {
-    villeErreur.innerHTML = "";
+  if (villeRegex.test(ville) === true) {
+    villeErreur.innerText = "";
   } else {
-    villeErreur.innerHTML = "Utilisez seulement des lettres !";
+    villeErreur.innerText = "Utilisez seulement des lettres !";
+    return;
   }
 });
 
-const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
-let email = document.getElementById("email");
-email.addEventListener("change", function (e) {
+let emailInput = document.getElementById("email");
+let emailErreur = document.getElementById("emailErrorMsg");
+emailInput.addEventListener("change", function (e) {
   email = e.target.value;
-  emailErreur = document.getElementById("emailErrorMsg");
   if (emailRegex.test(email) === true) {
-    emailErreur.innerHTML = "";
+    emailErreur.innerText = "";
   } else {
-    emailErreur.innerHTML = "Adresse mail non valide !";
+    emailErreur.innerText = "Adresse mail non valide !";
+    return;
   }
 });
+
 
 // Crée un objet contact avec les éléments entrés dans le formulaire 
 
 let commander = document.getElementById("order");
 commander.addEventListener("click", function (e) {
+  
   e.preventDefault();
-  let contact = new Object();
-  contact.firstName = prenom;
-  contact.lastName = nom;
-  contact.address = adresse;
-  contact.city = ville;
-  contact.email = email;
-  console.log(contact);
+
+  // Vérifie si les entrées sont correctes
+
+  if (!prenomRegex.test(prenom) || !nomRegex.test(nom) || !addRegex.test(adresse) || !villeRegex.test(ville) || !emailRegex.test(email)) {
+    alert("Il y a des erreurs dans le formulaire");
+    return;
+  }
+
+  let contact = {
+    firstName: prenom,
+    lastName: nom,
+    address: adresse,
+    city: ville,
+    email: email
+    };
+
+    // Vérifie si les éléments de contact sont non vides 
+
+    if (!contact.firstName || !contact.lastName || !contact.address || !contact.city || !contact.email) {
+      alert("Il faut remplir tous les champs du formulaire")
+      return;
+  } else {
+  }
+
+  // Récupére et stocke l'id des produits présents dans le panier
 
   const articleCommander = document.querySelectorAll(".cart__item");
-
-    // Récupére et stocke l'id des produits présents dans le panier 
 
   let products = [];
 
@@ -276,7 +307,6 @@ commander.addEventListener("click", function (e) {
 
   // Post dans l'api le formulaire et l'id des produits 
 
-    console.log(aEnvoyer);
     let envoyerCommande = fetch("http://localhost:3000/api/products/order", {
         method: "POST",
         body: JSON.stringify(aEnvoyer),
@@ -291,12 +321,8 @@ commander.addEventListener("click", function (e) {
     envoyerCommande.then(async (response) => {
     try {
         const contenu = await response.json();
-        console.log(contenu);
-        console.log(contenu.orderId);
         window.location.href = "./confirmation.html?orderId=" + contenu.orderId;
-        console.log(contenu.orderId);
     } catch (e) {
-        console.log(e);
     }
   });
 })
